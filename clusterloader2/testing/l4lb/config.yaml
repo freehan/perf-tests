@@ -6,8 +6,8 @@
 {{$LOAD_BALANCER_TYPE := DefaultParam .CL2_LOAD_BALANCER_TYPE "EXTERNAL"}}
 # $EXTERNAL_TRAFFIC_POLICY specifies the externalTrafficPolicy on LB type service. Valid values are "Cluster" and "Local"
 {{$EXTERNAL_TRAFFIC_POLICY := DefaultParam .CL2_EXTERNAL_TRAFFIC_POLICY "Cluster"}}
-# $NODE_SYNC_TIMEOUT specifies the timeout to wait for nodesync to complete
-{{$NODE_SYNC_TIMEOUT := DefaultParam .CL2_NODE_SYNC_TIMEOUT "30m"}}
+# $SYNC_TIMEOUT specifies the timeout to wait for nodesync and LB creation to complete
+{{$SYNC_TIMEOUT := DefaultParam .CL2_SYNC_TIMEOUT "30m"}}
 # adding a fixed value for first version of the test, rate of pod creation not a concern yet.
 {{$lbQPS := 20}}
 {{$namespaces := 1}}
@@ -27,6 +27,7 @@ steps:
     Params:
       action: start
       labelSelector: test = l4lb-load
+      waitTimeout: {{$SYNC_TIMEOUT}}
   - Identifier: WaitForRunningDeployments
     Method: WaitForControlledPodsRunning
     Params:
@@ -70,7 +71,7 @@ steps:
     Params:
       action: measure
       labelSelector: test = l4lb-load
-      waitTimeout: {{$NODE_SYNC_TIMEOUT}}
+      waitTimeout: {{$SYNC_TIMEOUT}}
 - name: Deleting LBs
   phases:
   - namespaceRange:
